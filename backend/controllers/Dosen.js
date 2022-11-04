@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import Dosen from "../models/DosenModel.js";
+import path from "path";
+import fs from "fs";
 
 export const GetCountDosen = async (req, res) => {
   try {
@@ -127,11 +129,32 @@ export const updateDataDsn = async (req, res) => {
       },
     });
     if (!dosen) return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (req.files === null) return res.status(400).json({msg: "No Images Uploaded"})
 
     dosen.email = req.body.email;
     dosen.no_hp = req.body.kontak;
-    dosen.save();
-    res.status(200).json({ msg: "Data updated successfuly" });
+
+    const file = req.files.file;
+    const fileSize = file.size;
+    const ext = path.extname(file.name)
+    const fileName = file.md5 + ext
+    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+    const allowedType = ['.png','.jpg','.jpeg'];
+    if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg: "Invalid Images"});
+    if(fileSize > 5000000) return res.status(422).json({msg: "Image must be less than 5 MB"});
+
+    dosen.image = fileName;
+    dosen.url = url;
+
+    file.mv(`./public/images/${fileName}`, async(err)=>{
+      if(err) return res.status(500).json({msg: err.message});
+      try {
+        dosen.save();
+        res.status(200).json({ msg: "Product updated successfuly" });
+      } catch (error) {
+        console.log(error.message);
+      }
+    })    
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

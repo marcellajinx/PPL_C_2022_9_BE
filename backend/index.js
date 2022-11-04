@@ -1,11 +1,14 @@
 import express from "express";
 import cors from "cors";
 import session from "express-session";
+import FileUpload from "express-fileupload";
+import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
+import SequelizeStore from "connect-session-sequelize";
+
 import db from "./config/database.js";
 import db2 from "./config/database2.js";
 import dbwil from "./config/databasewil.js";
-import SequelizeStore from "connect-session-sequelize";
 
 import UserRoute from "./routes/UserRoute.js";
 import MahasiswaRoute from "./routes/MahasiswaRoute.js";
@@ -49,6 +52,9 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static("public"));
+
 app.use(UserRoute);
 app.use(MahasiswaRoute);
 app.use(SidebarRoute);

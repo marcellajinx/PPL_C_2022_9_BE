@@ -44,6 +44,14 @@ const Dosen = db.define(
         notEmpty: true,
       },
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

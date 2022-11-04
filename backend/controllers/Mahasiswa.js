@@ -3,6 +3,8 @@ import Mahasiswa from "../models/MahasiswaModel.js";
 import Skripsi from "../models/SkripsiModel.js";
 import PKL from "../models/PKLModel.js";
 import User from "../models/UserModel.js";
+import path from "path";
+import fs from "fs";
 
 export const GetDashboardDosen = async (req, res) => {
   try {
@@ -260,8 +262,8 @@ export const updateDataMhs = async (req, res) => {
     });
     if (!mahasiswa)
       return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (req.files === null) return res.status(400).json({msg: "No Images Uploaded"})
 
-    console.log(req.body);
     mahasiswa.tempat_lahir = req.body.tempat_lahir;
     mahasiswa.tgl_lahir = req.body.tgl_lahir;
     mahasiswa.kode_wali = req.body.doswal;
@@ -273,9 +275,31 @@ export const updateDataMhs = async (req, res) => {
     mahasiswa.kodepos = req.body.kodepos;
     mahasiswa.jalur_masuk = req.body.jalur_masuk;
     mahasiswa.no_hp = req.body.kontak;
-    mahasiswa.save();
-    res.status(200).json({ msg: "Product updated successfuly" });
+    
+    const file = req.files.file;
+    const fileSize = file.size;
+    const ext = path.extname(file.name)
+    const fileName = file.md5 + ext
+    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+    const allowedType = ['.png','.jpg','.jpeg'];
+    if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg: "Invalid Images"});
+    if(fileSize > 5000000) return res.status(422).json({msg: "Image must be less than 5 MB"});
+
+    mahasiswa.image = fileName;
+    mahasiswa.url = url;
+
+    file.mv(`./public/images/${fileName}`, async(err)=>{
+      if(err) return res.status(500).json({msg: err.message});
+      try {
+        mahasiswa.save();
+        res.status(200).json({ msg: "Product updated successfuly" });
+      } catch (error) {
+        console.log(error.message);
+      }
+    })    
   } catch (error) {
+    console.log(req)
+    console.log(error)
     res.status(500).json({ msg: error.message });
   }
 };
