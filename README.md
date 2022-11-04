@@ -6,5 +6,6 @@
 - End point dapat diakses pada http://localhost:5000 
 
 ## Database Config
-- terdapat tiga db (tappl, db_wilayah, db_kodepos)
+- Terdapat tiga db (tappl, db_wilayah, db_kodepos)
 - Pada ketiga file dalam direktori /backend/config, sesuaikan konfigurasi username dan password
+- Menggunakan versi MySQL80
