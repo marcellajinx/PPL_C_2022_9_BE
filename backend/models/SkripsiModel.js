@@ -18,6 +18,9 @@ const Skripsi = db.define(
     status_skripsi: {
       type: DataTypes.CHAR,
     },
+    smt_skripsi: {
+      type: DataTypes.CHAR,
+    },
     nilai_skripsi: {
       type: DataTypes.CHAR,
     },
@@ -31,6 +34,9 @@ const Skripsi = db.define(
       type: DataTypes.CHAR,
     },
     status_verifikasi: {
+      type: DataTypes.CHAR,
+    },
+    url: {
       type: DataTypes.CHAR,
     },
   },

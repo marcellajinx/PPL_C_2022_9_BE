@@ -4,6 +4,9 @@ import Mahasiswa from "../models/MahasiswaModel.js";
 import Skripsi from "../models/SkripsiModel.js";
 import User from "../models/UserModel.js";
 
+import path from "path";
+import fs from "fs";
+
 export const GetAllSkripsi = async (req, res) => {
   try {
     const skripsi = await Skripsi.findAll();
@@ -26,34 +29,110 @@ export const GetSkripsiByNIM = async (req, res) => {
   }
 };
 
+export const UpdateSkripsi = async (req, res) => {
+  try {
+    const skripsi = await Skripsi.findOne({
+      where: {
+        nim: req.params.nim,
+      },
+    });
+    if (!skripsi) return res.status(404).json({ msg: "Data tidak ditemukan" });
+
+    let fileName = "";
+    if (req.files === null) {
+      fileName = skripsi.file_skripsi;
+    } else {
+      const file = req.files.file;
+      const fileSize = file.data.length;
+      const ext = path.extname(file.name);
+      fileName = file.md5 + ext;
+      const allowedType = [".pdf"];
+
+      if (!allowedType.includes(ext.toLowerCase()))
+        return res.status(422).json({ msg: "Invalid Files" });
+      if (fileSize > 5000000)
+        return res.status(422).json({ msg: "File must be less than 5 MB" });
+
+      const filepath = `./public/skripsi/${skripsi.file_skripsi}`;
+      fs.unlinkSync(filepath);
+
+      file.mv(`./public/skripsi/${fileName}`, (err) => {
+        if (err) return res.status(500).json({ msg: err.message });
+      });
+    }
+
+    try {
+      await Skripsi.update(
+        {
+          nim: req.params.nim,
+          nilai_skripsi: req.body.nilai_skripsi,
+          lama_studi: req.body.lama_studi,
+          tgl_sidang: req.body.tgl_sidang,
+          status_mhs: req.body.status_mhs,
+          status_skripsi: req.body.status_skripsi,
+          status_verifikasi: "0",
+          file_skripsi: fileName,
+          url: `${req.protocol}://${req.get("host")}/skripsi/${fileName}`,
+        },
+        {
+          where: {
+            nim: req.params.nim,
+          },
+        }
+      );
+      res.status(200).json({ msg: "Skripsi updated successfuly" });
+    } catch (error) {
+      console.log(error.message);
+    }
+  } catch (error) {
+    console.log(req.body);
+    console.log(error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
 export const CreateSkripsi = async (req, res) => {
+  if (req.files === null)
+    return res.status(400).json({ msg: "No File Uploaded" });
   const {
     status_mhs,
     status_skripsi,
     nilai_skripsi,
     lama_studi,
     tgl_sidang,
-    file_skripsi,
     status_verifikasi,
     nim,
   } = req.body;
-  try {
-    await Skripsi.create({
-      status_mhs,
-      status_skripsi,
-      nilai_skripsi,
-      lama_studi,
-      tgl_sidang,
-      file_skripsi,
-      status_verifikasi,
-      nim,
-    });
-    res.json({
-      message: "Skripsi Created",
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  const file = req.files.file;
+  const fileSize = file.data.length;
+  const ext = path.extname(file.name);
+  const fileName = file.md5 + ext;
+  const url = `${req.protocol}://${req.get("host")}/skripsi/${fileName}`;
+  const allowedType = [".pdf"];
+  if (!allowedType.includes(ext.toLowerCase()))
+    return res.status(422).json({ msg: "Invalid Files" });
+  if (fileSize > 5000000)
+    return res.status(422).json({ msg: "File must be less than 5 MB" });
+
+  file.mv(`./public/skripsi/${fileName}`, async (err) => {
+    if (err) return res.status(500).json({ msg: err.message });
+    try {
+      await Skripsi.create({
+        status_mhs,
+        status_skripsi,
+        nilai_skripsi,
+        lama_studi,
+        tgl_sidang,
+        status_verifikasi,
+        nim,
+        file_skripsi: fileName,
+        url: url,
+      });
+      res.status(201).json({ msg: "Skripsi Created Successfuly" });
+    } catch (error) {
+      console.log(error);
+    }
+  });
 };
 
 export const GetPieChartVerifSkripsi = async (req, res) => {
@@ -99,7 +178,7 @@ export const GetAllSkripsiByKeyword = async (req, res) => {
         {
           model: Skripsi,
           where: {
-            status_skripsi: {
+            status_verifikasi: {
               [Sequelize.Op.like]: Sequelize.literal(
                 `'%${req.params.status}%'`
               ),
@@ -140,19 +219,17 @@ export const GetAllSkripsiByKeyword = async (req, res) => {
 export const checkSkripsi = async (req, res) => {
   // check verif skripsi
   try {
-    console.log(req.body);
     const skripsi = await Skripsi.findOne({
       where: {
         nim: req.body.nim,
-        smt_skripsi: req.body.smt_skripsi,
       },
     });
     if (!skripsi) return res.status(404).json({ msg: "Data tidak ditemukan" });
 
-    if (skripsi.status_skripsi === "1") {
-      skripsi.status_skripsi = "0";
+    if (skripsi.status_verifikasi === "1") {
+      skripsi.status_verifikasi = "0";
     } else {
-      skripsi.status_skripsi = "1";
+      skripsi.status_verifikasi = "1";
     }
     skripsi.save();
     res.status(200).json({ msg: "Data updated successfuly" });
@@ -171,7 +248,7 @@ export const GetSkripsiByDoswal = async (req, res) => {
   try {
     const skripsi = await Skripsi.findAll({
       where: {
-        status_skripsi: {
+        status_verifikasi: {
           [Sequelize.Op.like]: Sequelize.literal(`'%${req.params.status}%'`),
         },
       },

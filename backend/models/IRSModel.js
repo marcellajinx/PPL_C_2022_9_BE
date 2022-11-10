@@ -28,6 +28,9 @@ const IRS = db.define(
     file_irs: {
       type: DataTypes.CHAR,
     },
+    url: {
+      type: DataTypes.CHAR,
+    },
   },
   {
     freezeTableName: true,

@@ -8,6 +8,7 @@ import {
   GetPieChartVerifSkripsi,
   GetSkripsiByDoswal,
   GetSkripsiByNIM,
+  UpdateSkripsi,
 } from "../controllers/Skripsi.js";
 import { mhsOnly, verifyUser } from "../middleware/AuthUser.js";
 
@@ -23,5 +24,6 @@ router.get(
   GetAllSkripsiByKeyword
 );
 router.patch("/checkv/skripsi", checkSkripsi);
+router.patch("/skripsi/:nim", UpdateSkripsi);
 
 export default router;

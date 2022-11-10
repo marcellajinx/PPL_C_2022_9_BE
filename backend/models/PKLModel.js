@@ -18,6 +18,9 @@ const PKL = db.define(
     status_pkl: {
       type: DataTypes.CHAR,
     },
+    smt_pkl: {
+      type: DataTypes.CHAR,
+    },
     nilai_pkl: {
       type: DataTypes.CHAR,
     },
@@ -25,6 +28,9 @@ const PKL = db.define(
       type: DataTypes.CHAR,
     },
     status_verifikasi: {
+      type: DataTypes.CHAR,
+    },
+    url: {
       type: DataTypes.CHAR,
     },
   },

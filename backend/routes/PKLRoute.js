@@ -8,6 +8,7 @@ import {
   GetPKLByDoswal,
   checkPKL,
   GetPKLByNIM,
+  UpdatePKL,
 } from "../controllers/PKL.js";
 import { mhsOnly, verifyUser } from "../middleware/AuthUser.js";
 
@@ -20,5 +21,6 @@ router.get("/pkld/:doswal/:keyword/:status", GetPKLByDoswal);
 router.get("/chart/pieverifpkl", GetPieChartVerifPKL);
 router.get("/mahasiswapkl/:keyword/:status/:angkatan", GetAllPKLByKeyword);
 router.patch("/checkv/pkl", checkPKL);
+router.patch("/pkl/:nim", UpdatePKL);
 
 export default router;

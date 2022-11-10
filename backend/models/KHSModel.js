@@ -35,6 +35,9 @@ const KHS = db.define(
     file_khs: {
       type: DataTypes.CHAR,
     },
+    url: {
+      type: DataTypes.CHAR,
+    },
   },
   {
     freezeTableName: true,

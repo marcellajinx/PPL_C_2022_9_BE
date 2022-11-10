@@ -7,6 +7,7 @@ import {
   GetAllIRS,
   checkIRS,
   GetIRSByDoswal,
+  UpdateIRS,
 } from "../controllers/IRS.js";
 import { mhsOnly, verifyUser } from "../middleware/AuthUser.js";
 
@@ -18,5 +19,6 @@ router.get("/irs", GetAllIRS);
 router.post("/irs", mhsOnly, CreateIRS);
 router.get("/chart/pieverifirs", GetPieChartVerifIRS);
 router.patch("/checkv/irs", checkIRS);
+router.patch("/irs/:nim", UpdateIRS);
 
 export default router;

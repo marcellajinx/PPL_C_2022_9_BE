@@ -3,6 +3,8 @@ import Dosen from "../models/DosenModel.js";
 import KHS from "../models/KHSModel.js";
 import Mahasiswa from "../models/MahasiswaModel.js";
 
+import path from "path";
+
 export const GetAllKHS = async (req, res) => {
   try {
     const khs = await KHS.findAll();
@@ -65,26 +67,104 @@ export const GetKHSByNIM = async (req, res) => {
   }
 };
 
-export const CreateKHS = async (req, res) => {
-  const { smt_khs, status_khs, jml_sks, jml_sksk, ips, ipk, file_khs, nim } =
-    req.body;
+export const UpdateKHS = async (req, res) => {
   try {
-    await KHS.create({
-      smt_khs,
-      status_khs,
-      jml_sks,
-      jml_sksk,
-      ips,
-      ipk,
-      file_khs,
-      nim,
+    const khs = await KHS.findOne({
+      where: {
+        nim: req.params.nim,
+        smt_khs: req.body.smt_khs,
+      },
     });
-    res.json({
-      message: "KHS Created",
-    });
+    if (!khs) return res.status(404).json({ msg: "Data tidak ditemukan" });
+
+    let fileName = "";
+    if (req.files === null) {
+      fileName = khs.file_khs;
+    } else {
+      const file = req.files.file;
+      const fileSize = file.data.length;
+      const ext = path.extname(file.name);
+      fileName = file.md5 + ext;
+      const allowedType = [".pdf"];
+
+      if (!allowedType.includes(ext.toLowerCase()))
+        return res.status(422).json({ msg: "Invalid Files" });
+      if (fileSize > 5000000)
+        return res.status(422).json({ msg: "File must be less than 5 MB" });
+
+      const filepath = `./public/khs/${khs.file_khs}`;
+      fs.unlinkSync(filepath);
+
+      file.mv(`./public/khs/${fileName}`, (err) => {
+        if (err) return res.status(500).json({ msg: err.message });
+      });
+    }
+
+    try {
+      await KHS.update(
+        {
+          nim: req.params.nim,
+          smt_khs: req.body.smt_khs,
+          jml_sks: req.body.jml_sks,
+          jml_sksk: req.body.jml_sksk,
+          ips: req.body.ips,
+          ipk: req.body.ipk,
+          status_khs: "0",
+          file_khs: fileName,
+          url: `${req.protocol}://${req.get("host")}/khs/${fileName}`,
+        },
+        {
+          where: {
+            nim: req.params.nim,
+            smt_khs: req.body.smt_khs,
+          },
+        }
+      );
+      res.status(200).json({ msg: "KHS updated successfuly" });
+    } catch (error) {
+      console.log(error.message);
+    }
   } catch (error) {
+    console.log(req.body);
     console.log(error);
+    res.status(500).json({ msg: error.message });
   }
+};
+
+export const CreateKHS = async (req, res) => {
+  if (req.files === null)
+    return res.status(400).json({ msg: "No File Uploaded" });
+  const { smt_khs, status_khs, jml_sks, jml_sksk, ips, ipk, nim } = req.body;
+  const file = req.files.file;
+  const fileSize = file.data.length;
+  const ext = path.extname(file.name);
+  const fileName = file.md5 + ext;
+  const url = `${req.protocol}://${req.get("host")}/khs/${fileName}`;
+  const allowedType = [".pdf"];
+  if (!allowedType.includes(ext.toLowerCase()))
+    return res.status(422).json({ msg: "Invalid Files" });
+  if (fileSize > 5000000)
+    return res.status(422).json({ msg: "File must be less than 5 MB" });
+
+  file.mv(`./public/khs/${fileName}`, async (err) => {
+    if (err) return res.status(500).json({ msg: err.message });
+    try {
+      await KHS.create({
+        smt_khs,
+        status_khs,
+        jml_sks,
+        jml_sksk,
+        ips,
+        ipk,
+        file_khs: fileName,
+        url: url,
+        nim,
+      });
+      res.status(201).json({ msg: "IRS Created Successfuly" });
+    } catch (error) {
+      console.log(error);
+    }
+  });
 };
 
 export const checkKHS = async (req, res) => {
