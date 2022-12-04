@@ -267,18 +267,18 @@ export const updateDataMhs = async (req, res) => {
       return res;
     }
 
-    // no upload image, no previous image
+    // no uploaded image, no previous image
     if (
       req.files === null &&
       mahasiswa.image === null &&
       mahasiswa.url === null
     ) {
-      res.statusMessage = "No student data found.";
+      res.statusMessage = "You must upload your photo.";
       res.status(400).json({ msg: "No Images Uploaded" }).end();
       return res;
     }
 
-    // no upload image, has previous image
+    // no uploaded image, has previous image
     if (
       req.files === null &&
       mahasiswa.image !== null &&
@@ -304,7 +304,7 @@ export const updateDataMhs = async (req, res) => {
       }
     }
 
-    // has upload image
+    // has uploaded image
     const file = req.files.file;
     const fileSize = file.size;
     const ext = path.extname(file.name);

@@ -132,24 +132,52 @@ export const updateDataDsn = async (req, res) => {
         nip: req.params.nip,
       },
     });
-    if (!dosen) return res.status(404).json({ msg: "Data tidak ditemukan" });
-    if (req.files === null)
-      return res.status(400).json({ msg: "No Images Uploaded" });
+    if (!dosen) {
+      res.statusMessage = "No lecturers data found.";
+      res.status(404).json({ msg: "Data tidak ditemukan" }).end();
+      return res;
+    }
 
-    dosen.email = req.body.email;
-    dosen.no_hp = req.body.kontak;
+    // no uploaded image, no previous image
+    if (req.files === null && dosen.image === null && dosen.url === null) {
+      res.statusMessage = "You must upload your photo.";
+      res.status(400).json({ msg: "No Images Uploaded" }).end();
+      return res;
+    }
 
+    // no uploaded image, has previous image
+    if (req.files === null && dosen.image !== null && dosen.url !== null) {
+      dosen.email = req.body.email;
+      dosen.no_hp = req.body.kontak;
+      try {
+        dosen.save();
+        res.statusMessage = "Data updated successfully";
+        return res.status(200).json({ msg: "Data updated successfuly" });
+      } catch (error) {
+        return error.message;
+      }
+    }
+
+    // has uploaded image
     const file = req.files.file;
     const fileSize = file.size;
     const ext = path.extname(file.name);
     const fileName = file.md5 + ext;
     const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
     const allowedType = [".png", ".jpg", ".jpeg"];
-    if (!allowedType.includes(ext.toLowerCase()))
-      return res.status(422).json({ msg: "File must be .png, .jpg, or .jpeg" });
-    if (fileSize > 5000000)
-      return res.status(422).json({ msg: "Image must be less than 5 MB" });
+    if (!allowedType.includes(ext.toLowerCase())) {
+      res.statusMessage = "File must be .jpg, .jpeg, or .png";
+      res.status(422).json({ msg: "File must be .jpg, .jpeg, or .png" }).end();
+      return res;
+    }
+    if (fileSize > 5000000) {
+      res.statusMessage = "Maximum image size is 5MB";
+      res.status(422).json({ msg: "Maximum image size is 5MB" }).end();
+      return res;
+    }
 
+    dosen.email = req.body.email;
+    dosen.no_hp = req.body.kontak;
     dosen.image = fileName;
     dosen.url = url;
 
