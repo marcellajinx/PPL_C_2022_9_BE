@@ -38,6 +38,9 @@ const KHS = db.define(
     url: {
       type: DataTypes.CHAR,
     },
+    status_mhs: {
+      type: DataTypes.CHAR,
+    },
   },
   {
     freezeTableName: true,

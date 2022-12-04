@@ -134,7 +134,8 @@ export const UpdateKHS = async (req, res) => {
 export const CreateKHS = async (req, res) => {
   if (req.files === null)
     return res.status(400).json({ msg: "No File Uploaded" });
-  const { smt_khs, status_khs, jml_sks, jml_sksk, ips, ipk, nim } = req.body;
+  const { smt_khs, status_khs, jml_sks, jml_sksk, ips, ipk, nim, status_mhs } =
+    req.body;
   const file = req.files.file;
   const fileSize = file.data.length;
   const ext = path.extname(file.name);
@@ -159,6 +160,7 @@ export const CreateKHS = async (req, res) => {
         file_khs: fileName,
         url: url,
         nim,
+        status_mhs,
       });
       res.status(201).json({ msg: "IRS Created Successfuly" });
     } catch (error) {

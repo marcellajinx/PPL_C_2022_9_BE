@@ -208,7 +208,7 @@ export const UpdateIRS = async (req, res) => {
 export const CreateIRS = async (req, res) => {
   if (req.files === null)
     return res.status(400).json({ msg: "No File Uploaded" });
-  const { smt_irs, status_irs, jml_sks, nim } = req.body;
+  const { smt_irs, status_irs, jml_sks, nim, status_mhs } = req.body;
   const file = req.files.file;
   const fileSize = file.data.length;
   const ext = path.extname(file.name);
@@ -224,6 +224,8 @@ export const CreateIRS = async (req, res) => {
 
     // if (err) console.log(err);
     try {
+      console.log(228);
+      console.log(req.body);
       await IRS.create({
         smt_irs,
         status_irs,
@@ -231,6 +233,7 @@ export const CreateIRS = async (req, res) => {
         file_irs: fileName,
         url: url,
         nim,
+        status_mhs,
       });
       res.status(201).json({ msg: "IRS Created Successfuly" });
     } catch (error) {
