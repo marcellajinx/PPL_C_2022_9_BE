@@ -259,11 +259,71 @@ export const updateDataMhs = async (req, res) => {
         nim: req.params.nim,
       },
     });
-    if (!mahasiswa)
-      return res.status(404).json({ msg: "Data tidak ditemukan" });
-    if (req.files === null)
-      return res.status(400).json({ msg: "No Images Uploaded" });
 
+    // no student found
+    if (!mahasiswa) {
+      res.statusMessage = "No student data found.";
+      res.status(404).json({ msg: "Data tidak ditemukan" }).end();
+      return res;
+    }
+
+    // no upload image, no previous image
+    if (
+      req.files === null &&
+      mahasiswa.image === null &&
+      mahasiswa.url === null
+    ) {
+      res.statusMessage = "No student data found.";
+      res.status(400).json({ msg: "No Images Uploaded" }).end();
+      return res;
+    }
+
+    // no upload image, has previous image
+    if (
+      req.files === null &&
+      mahasiswa.image !== null &&
+      mahasiswa.url !== null
+    ) {
+      mahasiswa.tempat_lahir = req.body.tempat_lahir;
+      mahasiswa.tgl_lahir = req.body.tgl_lahir;
+      mahasiswa.kode_wali = req.body.doswal;
+      mahasiswa.alamat = req.body.alamat;
+      mahasiswa.provinsi = req.body.provinsi;
+      mahasiswa.kota = req.body.kota;
+      mahasiswa.kecamatan = req.body.kecamatan;
+      mahasiswa.kelurahan = req.body.kelurahan;
+      mahasiswa.kodepos = req.body.kodepos;
+      mahasiswa.jalur_masuk = req.body.jalur_masuk;
+      mahasiswa.no_hp = req.body.kontak;
+      try {
+        mahasiswa.save();
+        res.statusMessage = "Data updated successfully";
+        return res.status(200).json({ msg: "Data updated successfuly" });
+      } catch (error) {
+        return error.message;
+      }
+    }
+
+    // has upload image
+    const file = req.files.file;
+    const fileSize = file.size;
+    const ext = path.extname(file.name);
+    const fileName = file.md5 + ext;
+    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+    const allowedType = [".png", ".jpg", ".jpeg"];
+    if (!allowedType.includes(ext.toLowerCase())) {
+      res.statusMessage = "File must be .jpg, .jpeg, or .png";
+      res.status(422).json({ msg: "File must be .jpg, .jpeg, or .png" }).end();
+      return res;
+    }
+    if (fileSize > 5000000) {
+      res.statusMessage = "Maximum image size is 5MB";
+      res.status(422).json({ msg: "Maximum image size is 5MB" }).end();
+      return res;
+    }
+
+    mahasiswa.image = fileName;
+    mahasiswa.url = url;
     mahasiswa.tempat_lahir = req.body.tempat_lahir;
     mahasiswa.tgl_lahir = req.body.tgl_lahir;
     mahasiswa.kode_wali = req.body.doswal;
@@ -275,20 +335,6 @@ export const updateDataMhs = async (req, res) => {
     mahasiswa.kodepos = req.body.kodepos;
     mahasiswa.jalur_masuk = req.body.jalur_masuk;
     mahasiswa.no_hp = req.body.kontak;
-
-    const file = req.files.file;
-    const fileSize = file.size;
-    const ext = path.extname(file.name);
-    const fileName = file.md5 + ext;
-    const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
-    const allowedType = [".png", ".jpg", ".jpeg"];
-    if (!allowedType.includes(ext.toLowerCase()))
-      return res.status(422).json({ msg: "Invalid Images" });
-    if (fileSize > 5000000)
-      return res.status(422).json({ msg: "Image must be less than 5 MB" });
-
-    mahasiswa.image = fileName;
-    mahasiswa.url = url;
 
     file.mv(`./public/images/${fileName}`, async (err) => {
       if (err) return res.status(500).json({ msg: err.message });

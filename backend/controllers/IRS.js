@@ -165,7 +165,7 @@ export const UpdateIRS = async (req, res) => {
       const allowedType = [".pdf"];
 
       if (!allowedType.includes(ext.toLowerCase()))
-        return res.status(422).json({ msg: "Invalid Files" });
+        return res.status(422).json({ msg: "File must be .pdf" });
       if (fileSize > 5000000)
         return res.status(422).json({ msg: "File must be less than 5 MB" });
 
@@ -216,7 +216,7 @@ export const CreateIRS = async (req, res) => {
   const url = `${req.protocol}://${req.get("host")}/irs/${fileName}`;
   const allowedType = [".pdf"];
   if (!allowedType.includes(ext.toLowerCase()))
-    return res.status(422).json({ msg: "Invalid Files" });
+    return res.status(422).json({ msg: "File must be .pdf" });
   if (fileSize > 5000000)
     return res.status(422).json({ msg: "File must be less than 5 MB" });
   file.mv(`./public/irs/${fileName}`, async (err) => {

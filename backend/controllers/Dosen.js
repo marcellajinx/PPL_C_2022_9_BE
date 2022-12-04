@@ -146,7 +146,7 @@ export const updateDataDsn = async (req, res) => {
     const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
     const allowedType = [".png", ".jpg", ".jpeg"];
     if (!allowedType.includes(ext.toLowerCase()))
-      return res.status(422).json({ msg: "Invalid Images" });
+      return res.status(422).json({ msg: "File must be .png, .jpg, or .jpeg" });
     if (fileSize > 5000000)
       return res.status(422).json({ msg: "Image must be less than 5 MB" });
 
