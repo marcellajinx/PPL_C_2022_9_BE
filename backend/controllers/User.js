@@ -48,7 +48,7 @@ export const CreateUser = async (req, res) => {
           angkatan,
           tempat_lahir: "NOT SET",
           kode_wali: "1002",
-          kode_prov: "11",
+          provinsi: "11",
           tgl_lahir: new Date().toJSON().slice(0, 10).replace(/-/g, "/"),
         });
       } else if (roles == 2) {

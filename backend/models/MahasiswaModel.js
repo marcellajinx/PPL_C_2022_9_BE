@@ -41,7 +41,6 @@ const Mahasiswa = db.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        isEmail: true,
       },
     },
     jalur_masuk: {
@@ -88,31 +87,15 @@ const Mahasiswa = db.define(
     },
     kodepos: {
       type: DataTypes.CHAR,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
     },
     kelurahan: {
       type: DataTypes.CHAR,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
     },
     kecamatan: {
       type: DataTypes.CHAR,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
     },
     kota: {
       type: DataTypes.CHAR,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
     },
     provinsi: {
       type: DataTypes.CHAR,
