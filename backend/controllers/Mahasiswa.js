@@ -302,6 +302,7 @@ export const updateDataMhs = async (req, res) => {
       mahasiswa.tgl_lahir = req.body.tgl_lahir;
       mahasiswa.kode_wali = req.body.doswal;
       mahasiswa.alamat = req.body.alamat;
+      mahasiswa.email = req.body.email;
       mahasiswa.provinsi = req.body.provinsi;
       mahasiswa.kota = req.body.kota;
       mahasiswa.kecamatan = req.body.kecamatan;
@@ -341,6 +342,7 @@ export const updateDataMhs = async (req, res) => {
     mahasiswa.tempat_lahir = req.body.tempat_lahir;
     mahasiswa.tgl_lahir = req.body.tgl_lahir;
     mahasiswa.kode_wali = req.body.doswal;
+    mahasiswa.email = req.body.email;
     mahasiswa.alamat = req.body.alamat;
     mahasiswa.provinsi = req.body.provinsi;
     mahasiswa.kota = req.body.kota;

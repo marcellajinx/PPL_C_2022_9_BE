@@ -42,13 +42,13 @@ export const CreateUser = async (req, res) => {
           nama,
           status_mhs: status,
           alamat: "NOT SET",
-          email: username.split(" ")[0] + "@gmail.com",
+          email: "NOT SET",
           jalur_masuk: "SNMPTN",
           no_hp: "NOT SET",
           angkatan,
           tempat_lahir: "NOT SET",
-          kode_wali: "NOT SET",
-          kode_prov: "NOT SET",
+          kode_wali: "1002",
+          kode_prov: "11",
           tgl_lahir: new Date().toJSON().slice(0, 10).replace(/-/g, "/"),
         });
       } else if (roles == 2) {
