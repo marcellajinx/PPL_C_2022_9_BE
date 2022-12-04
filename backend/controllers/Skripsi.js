@@ -102,6 +102,7 @@ export const CreateSkripsi = async (req, res) => {
     tgl_sidang,
     status_verifikasi,
     nim,
+    smt_skripsi,
   } = req.body;
   const file = req.files.file;
   const fileSize = file.data.length;
@@ -120,6 +121,7 @@ export const CreateSkripsi = async (req, res) => {
       await Skripsi.create({
         status_mhs,
         status_skripsi,
+        smt_skripsi,
         nilai_skripsi,
         lama_studi,
         tgl_sidang,

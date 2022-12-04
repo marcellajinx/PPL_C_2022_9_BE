@@ -92,7 +92,7 @@ export const UpdatePKL = async (req, res) => {
 export const CreatePKL = async (req, res) => {
   if (req.files === null)
     return res.status(400).json({ msg: "No File Uploaded" });
-  const { status_mhs, status_pkl, nilai_pkl, status_verifikasi, nim } =
+  const { status_mhs, status_pkl, nilai_pkl, status_verifikasi, nim, smt_pkl } =
     req.body;
   const file = req.files.file;
   const fileSize = file.data.length;
@@ -112,6 +112,7 @@ export const CreatePKL = async (req, res) => {
         status_mhs,
         status_pkl,
         nilai_pkl,
+        smt_pkl,
         status_verifikasi,
         nim,
         file_pkl: fileName,
