@@ -90,8 +90,22 @@ export const GetBarChartStatusMhs = async (req, res) => {
 export const GetPieChartStatusMhs = async (req, res) => {
   try {
     const chartStatus = await Mahasiswa.findAll({
-      attributes: [[Sequelize.fn("COUNT", Sequelize.col("nim")), "jumlah"]],
-      group: "status_mhs",
+      attributes: [
+        [
+          Sequelize.fn(
+            "SUM",
+            Sequelize.literal('CASE WHEN status_mhs = "0" THEN 1 ELSE 0 END')
+          ),
+          "CUTI",
+        ],
+        [
+          Sequelize.fn(
+            "SUM",
+            Sequelize.literal('CASE WHEN status_mhs = "1" THEN 1 ELSE 0 END')
+          ),
+          "AKTIF",
+        ],
+      ],
     });
     res.status(200).json(chartStatus);
   } catch (error) {
